@@ -1,4 +1,5 @@
 import CreateToDo from "./CreateToDo";
+import KanbanBoard from "./KanbanBoard";
 import Profile from "./Profile";
 
 const Dashboard = () => {
@@ -7,7 +8,9 @@ const Dashboard = () => {
             <div className="flex justify-center gap-5 my-5 px-10 rounded-full w-fit mx-auto border-2 py-5 items-center">
                 <CreateToDo></CreateToDo>
                 <Profile></Profile>
+                
             </div>
+            <KanbanBoard></KanbanBoard>
         </div>
     );
 };

@@ -4,7 +4,8 @@ import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { useState } from 'react';
+import HourglassTopIcon from '@mui/icons-material/HourglassTop';
+import { useContext, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import {
     TextField,
@@ -16,6 +17,8 @@ import {
     Select,
     MenuItem,
 } from '@mui/material';
+import useAxiosPublic from '../hooks/useAxiosPublic';
+import { ContextProvider } from '../auth/AuthProvider';
 
 const style = {
     position: 'absolute',
@@ -35,10 +38,28 @@ const CreateToDo = () => {
     const handleClose = () => setOpen(false);
 
     const { handleSubmit, control } = useForm();
+    const axiosPublic = useAxiosPublic()
+    const { user } = useContext(ContextProvider);
+    const [loading, setLoading] = useState(false);
 
     const onSubmit = (data) => {
-        // Handle form submission logic here
-        console.log(data);
+        setLoading(true);
+
+        const todoData = {
+            title: data.title,
+            description: data.description,
+            deadline: data.deadline,
+            priority: data.priority,
+            email: user.email,
+        }
+        axiosPublic.post('/all-todo', todoData)
+            .then(res => {
+                if (res.data.acknowledged) {
+                    setLoading(false)
+                    alert('create a todo')
+                }
+            })
+
     };
 
     return (
@@ -136,16 +157,27 @@ const CreateToDo = () => {
                                             </FormControl>
                                         </Grid>
                                     </Grid>
-                                    <Button
-                                        type="submit"
-                                        variant="contained"
-                                        color="primary"
-                                        fullWidth
-                                        size="large"
-                                        sx={{marginTop:'20px'}}
-                                    >
-                                        Create Task
-                                    </Button>
+                                    {loading ?
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            fullWidth
+                                            size="large"
+                                            sx={{ marginTop: '20px' }}
+                                        >
+                                            <div className='animate-spin'><HourglassTopIcon></HourglassTopIcon></div>
+                                        </Button> :
+                                        <Button
+                                            type="submit"
+                                            variant="contained"
+                                            color="primary"
+                                            fullWidth
+                                            size="large"
+                                            sx={{ marginTop: '20px' }}
+                                        >
+                                            Create Task
+                                        </Button>
+                                    }
                                 </form>
                             </div>
                         </Container>
