@@ -1,4 +1,4 @@
-import React from 'react'
+import  { Toaster } from 'react-hot-toast';
 import ReactDOM from 'react-dom/client'
 import './index.css'
 import {
@@ -17,6 +17,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
+      <Toaster></Toaster>
       <RouterProvider router={router} />
     </AuthProvider>
   </QueryClientProvider>

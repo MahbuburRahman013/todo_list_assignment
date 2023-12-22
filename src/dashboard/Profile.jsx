@@ -3,12 +3,16 @@ import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import useGetAllTodo from '../hooks/useGetAllTodo';
+import { ContextProvider } from '../auth/AuthProvider';
+import ClearIcon from '@mui/icons-material/Clear';
+import { IconButton } from '@mui/material';
 
 const style = {
     position: 'absolute',
     top: '50%',
+    borderRadius: '7px',
     left: '50%',
     transform: 'translate(-50%, -50%)',
     bgcolor: 'background.paper',
@@ -20,6 +24,14 @@ const Profile = () => {
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+    const { user } = useContext(ContextProvider);
+    const [todoData] = useGetAllTodo();
+    const ownData = todoData.filter(item => item.email === user.email);
+    const ownTodo = ownData.filter(item => item.status == 'todo');
+    const ownOnGoing = ownData.filter(item => item.status == 'onGoing');
+    const ownComplete = ownData.filter(item => item.status == 'complete');
+    // console.log(ownTodo,ownOnGoing,ownComplete)
+    console.log(user)
 
     return (
         <div>
@@ -39,12 +51,78 @@ const Profile = () => {
             >
                 <Fade in={open}>
                     <Box sx={style}>
-                        <Typography id="transition-modal-title" variant="h6" component="h2">
-                            Text in a modal
-                        </Typography>
-                        <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-                            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-                        </Typography>
+                        <div className=''>
+                            <div className='flex justify-end'>
+                                <IconButton onClick={handleClose} aria-label="delete">
+                                    <ClearIcon></ClearIcon>
+                                </IconButton>
+
+                            </div>
+                            <div>
+                                <div className='flex gap-y-3 justify-center flex-col items-center'><img className="w-32 rounded-full" src={user.photoURL} alt="img" />
+                                    <h1 className='text-2xl font-semibold text-gray-600'>{user.displayName}</h1>
+                                </div>
+                                <div className='lg:flex hidden justify-center items-center gap-10'>
+                                    <div className='py-3 w-96 h-72 overflow-y-auto px-5 bg-pink-200'>
+                                        <h1 className='text-xl font-semibold text-gray-600 text-center mb-3'>TODO</h1>
+                                        {
+                                            ownTodo.map(item => <div key={item._id}>
+                                                <div className='border rounded-md border-gray-400 my-2 shadow-lg px-3 py-2'>
+                                                    <div className="flex justify-between items-center">
+                                                        <h1 className="text-center flex-1 text-xl uppercase font-semibold text-gray-700">{item.title}</h1>
+                                                    </div>
+                                                    <p className="text-gray-600 my-3">{item.description}</p>
+                                                    <div className="flex justify-between items-center">
+                                                        <p>Deadline: {item.deadline}</p>
+                                                        <p className="font-semibold text-gray-600 uppercase">{item.priority}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            )
+                                        }
+                                    </div>
+                                    <div className='py-3 h-72 w-96 overflow-y-auto px-5 bg-pink-200'>
+                                        <h1 className='text-xl font-semibold text-gray-600 text-center mb-3'>ON GOING</h1>
+                                        {
+                                            ownOnGoing.map(item => <div key={item._id}>
+                                                <div className='border rounded-md border-gray-400 my-2 shadow-lg px-3 py-2'>
+                                                    <div className="flex justify-between items-center">
+                                                        <h1 className="text-center flex-1 text-xl uppercase font-semibold text-gray-700">{item.title}</h1>
+                                                    </div>
+                                                    <p className="text-gray-600 my-3">{item.description}</p>
+                                                    <div className="flex justify-between items-center">
+                                                        <p>Deadline: {item.deadline}</p>
+                                                        <p className="font-semibold text-gray-600 uppercase">{item.priority}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            )
+                                        }
+                                    </div>
+                                    <div className='py-3 h-72 w-96 overflow-y-auto px-5 bg-pink-200'>
+                                        <h1 className='text-xl font-semibold text-gray-600 text-center mb-3'>COMPLETED</h1>
+                                        {
+                                            ownComplete.map(item => <div key={item._id}>
+                                                <div className='border rounded-md border-gray-400 my-2 shadow-lg px-3 py-2'>
+                                                    <div className="flex justify-between items-center">
+                                                        <h1 className="text-center flex-1 text-xl uppercase font-semibold text-gray-700">{item.title}</h1>
+                                                    </div>
+                                                    <p className="text-gray-600 my-3">{item.description}</p>
+                                                    <div className="flex justify-between items-center">
+                                                        <p>Deadline: {item.deadline}</p>
+                                                        <p className="font-semibold text-gray-600 uppercase">{item.priority}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            )
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </Box>
                 </Fade>
             </Modal>

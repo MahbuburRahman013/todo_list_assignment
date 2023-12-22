@@ -5,50 +5,74 @@ import { Link } from 'react-router-dom';
 import { TextField, Button, Typography, Container, CssBaseline, Grid } from '@mui/material';
 import { useContext } from 'react';
 import { ContextProvider } from '../auth/AuthProvider';
+import toast from 'react-hot-toast';
+import { useNavigate, useLocation } from 'react-router-dom'
 
 
 const Login = () => {
     const { handleSubmit, control } = useForm();
-    const {signInUser, signInGoogle, signInFacebook} = useContext(ContextProvider);
+    const { signInUser, signInGoogle, signInFacebook } = useContext(ContextProvider);
+    const navigate = useNavigate();
+    const location = useLocation()
+
 
     const onSubmit = (data) => {
 
         signInUser(data.email, data.password)
-        .then(result=> {
-            console.log(result.user);
-        })
-        .catch(error=> {
-            console.log(error.message);
-        })
-        
+            .then(result => {
+                if (result) {
+                    toast.success('SignIn Successfully');
+                    location?.state ? navigate(location.state) :
+                        navigate('/')
+                }
+
+            })
+            .catch(error => {
+                if (error.message) {
+                    toast.error(error.message);
+                }
+            })
+
     };
 
     const handleGoogle = () => {
 
         signInGoogle()
-        .then(result=> {
-          console.log(result.user)
-         
-        })
-        .catch(error=> {
-          console.log(error);
-          
-        })
-  }
+            .then(result => {
+                if (result) {
+                    toast.success('SignIn Successfully');
+                    location?.state ? navigate(location.state) :
+                        navigate('/')
+                }
+
+            })
+            .catch(error => {
+                if (error.message) {
+                    toast.error(error.message);
+                }
+
+            })
+    }
 
 
-  const handleFacebook = () => {
+    const handleFacebook = () => {
 
-    signInFacebook()
-    .then(result=> {
-      console.log(result.user)
-     
-    })
-    .catch(error=> {
-      console.log(error);
-      
-    })
-}
+        signInFacebook()
+            .then(result => {
+                if (result) {
+                    toast.success('SignIn Successfully');
+                    location?.state ? navigate(location.state) :
+                        navigate('/')
+                }
+
+            })
+            .catch(error => {
+                if (error.message) {
+                    toast.error(error.message);
+                }
+
+            })
+    }
 
 
     return (
@@ -56,7 +80,7 @@ const Login = () => {
             <Container component="main" maxWidth="xs">
                 <CssBaseline />
                 <div className="mt-8">
-                    <Typography component="h1" variant="h4" sx={{fontWeight:"700", color:'gray'}} className="text-center">
+                    <Typography component="h1" variant="h4" sx={{ fontWeight: "700", color: 'gray' }} className="text-center">
                         Sign in
                     </Typography>
                     <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
@@ -100,7 +124,7 @@ const Login = () => {
                             fullWidth
                             variant="contained"
                             color="primary"
-                            sx={{marginTop:"20px"}}
+                            sx={{ marginTop: "20px" }}
                         >
                             Sign In
                         </Button>
@@ -110,18 +134,18 @@ const Login = () => {
                             fullWidth
                             variant="outlined"
                             color="success"
-                            sx={{marginTop:"20px"}}
+                            sx={{ marginTop: "20px" }}
                         >
-                           <span className='px-3'><GoogleIcon></GoogleIcon></span> Sign In With Google
+                            <span className='px-3'><GoogleIcon></GoogleIcon></span> Sign In With Google
                         </Button>
                         <Button
                             onClick={handleFacebook}
                             fullWidth
                             variant="outlined"
                             color="success"
-                            sx={{marginTop:"20px"}}
+                            sx={{ marginTop: "20px" }}
                         >
-                             <span className='pr-2'><FacebookIcon></FacebookIcon></span> 
+                            <span className='pr-2'><FacebookIcon></FacebookIcon></span>
                             Sign In With FaceBook
                         </Button>
                         <Grid container justifyContent="flex-end" className="mt-2">

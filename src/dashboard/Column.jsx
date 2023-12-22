@@ -6,7 +6,6 @@ import { Droppable } from "react-beautiful-dnd";
 const Container = styled.div`
   background-color: #f4f5f7;
   border-radius: 2.5px;
-  width: 380px;
   height: 475px;
   overflow-y: scroll;
   -ms-overflow-style: none;
@@ -30,7 +29,7 @@ const TaskList = styled.div`
 
 export default function Column({ title, tasks, id }) {
   return (
-    <Container className="column">
+    <Container className="column w-[300px] md:w-[380px]">
       <Title
         style={{
           backgroundColor: "lightblue",

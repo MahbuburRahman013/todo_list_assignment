@@ -7,6 +7,9 @@ import Typography from '@mui/material/Typography';
 import HourglassTopIcon from '@mui/icons-material/HourglassTop';
 import { useContext, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
+import ClearIcon from '@mui/icons-material/Clear';
+import { IconButton } from '@mui/material';
+import toast from 'react-hot-toast';
 import {
     TextField,
     Container,
@@ -19,6 +22,7 @@ import {
 } from '@mui/material';
 import useAxiosPublic from '../hooks/useAxiosPublic';
 import { ContextProvider } from '../auth/AuthProvider';
+import useGetAllTodo from '../hooks/useGetAllTodo';
 
 const style = {
     position: 'absolute',
@@ -27,7 +31,7 @@ const style = {
     transform: 'translate(-50%, -50%)',
     bgcolor: 'background.paper',
     boxShadow: 24,
-    p: 4,
+    p: 2,
 };
 
 
@@ -36,6 +40,7 @@ const CreateToDo = () => {
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+    const [, refetch] = useGetAllTodo();
 
     const { handleSubmit, control } = useForm();
     const axiosPublic = useAxiosPublic()
@@ -51,12 +56,14 @@ const CreateToDo = () => {
             deadline: data.deadline,
             priority: data.priority,
             email: user.email,
+            status: 'todo',
         }
         axiosPublic.post('/all-todo', todoData)
             .then(res => {
                 if (res.data.acknowledged) {
                     setLoading(false)
-                    alert('create a todo')
+                    refetch()
+                    toast.success('create a todo')
                 }
             })
 
@@ -79,109 +86,117 @@ const CreateToDo = () => {
                 }}
             >
                 <Fade in={open}>
-                    <Box sx={style}>
-                        <Container component="main" maxWidth="md">
-                            <CssBaseline />
-                            <div className="mt-8">
-                                <Typography variant="h4" align="center" gutterBottom>
-                                    Task Form
-                                </Typography>
-                                <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
-                                    <Grid container spacing={2}>
-                                        <Grid item xs={12}>
-                                            <Controller
-                                                name="title"
-                                                control={control}
-                                                defaultValue=""
-                                                render={({ field }) => (
-                                                    <TextField
-                                                        {...field}
-                                                        label="Title"
-                                                        variant="outlined"
-                                                        fullWidth
-                                                        required
-                                                    />
-                                                )}
-                                            />
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <Controller
-                                                name="description"
-                                                control={control}
-                                                defaultValue=""
-                                                render={({ field }) => (
-                                                    <TextField
-                                                        {...field}
-                                                        label="Description"
-                                                        variant="outlined"
-                                                        fullWidth
-                                                        multiline
-                                                        rows={4}
-                                                        required
-                                                    />
-                                                )}
-                                            />
-                                        </Grid>
-                                        <Grid item xs={6}>
-                                            <Controller
-                                                name="deadline"
-                                                control={control}
-                                                defaultValue=""
-                                                render={({ field }) => (
-                                                    <TextField
-                                                        {...field}
-                                                        label="Deadline"
-                                                        type="date"
-                                                        variant="outlined"
-                                                        fullWidth
-                                                        required
-                                                    />
-                                                )}
-                                            />
-                                        </Grid>
-                                        <Grid item xs={6}>
-                                            <FormControl fullWidth variant="outlined" required>
-                                                <InputLabel>Priority</InputLabel>
+                    <div>
+                        <Box sx={style}>
+                        <div className='flex justify-end'>
+                            <IconButton onClick={handleClose} aria-label="delete">
+                            <ClearIcon></ClearIcon>
+                            </IconButton>
+                            
+                        </div>
+                            <Container component="main" maxWidth="md">
+                                <CssBaseline />
+                                <div className="mt-8">
+                                    <Typography variant="h4" align="center" gutterBottom>
+                                        Task Form
+                                    </Typography>
+                                    <form onSubmit={handleSubmit(onSubmit)} className="mt-4 md:w-auto w-[250px]">
+                                        <Grid container spacing={2}>
+                                            <Grid item xs={12}>
                                                 <Controller
-                                                    name="priority"
+                                                    name="title"
                                                     control={control}
                                                     defaultValue=""
                                                     render={({ field }) => (
-                                                        <Select {...field} label="Priority">
-                                                            <MenuItem value="low">Low</MenuItem>
-                                                            <MenuItem value="moderate">Moderate</MenuItem>
-                                                            <MenuItem value="high">High</MenuItem>
-                                                        </Select>
+                                                        <TextField
+                                                            {...field}
+                                                            label="Title"
+                                                            variant="outlined"
+                                                            fullWidth
+                                                            required
+                                                        />
                                                     )}
                                                 />
-                                            </FormControl>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Controller
+                                                    name="description"
+                                                    control={control}
+                                                    defaultValue=""
+                                                    render={({ field }) => (
+                                                        <TextField
+                                                            {...field}
+                                                            label="Description"
+                                                            variant="outlined"
+                                                            fullWidth
+                                                            multiline
+                                                            rows={4}
+                                                            required
+                                                        />
+                                                    )}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={6}>
+                                                <Controller
+                                                    name="deadline"
+                                                    control={control}
+                                                    defaultValue=""
+                                                    render={({ field }) => (
+                                                        <TextField
+                                                            {...field}
+                                                            label="Deadline"
+                                                            type="date"
+                                                            variant="outlined"
+                                                            fullWidth
+                                                            required
+                                                        />
+                                                    )}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={6}>
+                                                <FormControl fullWidth variant="outlined" required>
+                                                    <InputLabel>Priority</InputLabel>
+                                                    <Controller
+                                                        name="priority"
+                                                        control={control}
+                                                        defaultValue=""
+                                                        render={({ field }) => (
+                                                            <Select {...field} label="Priority">
+                                                                <MenuItem value="low">Low</MenuItem>
+                                                                <MenuItem value="moderate">Moderate</MenuItem>
+                                                                <MenuItem value="high">High</MenuItem>
+                                                            </Select>
+                                                        )}
+                                                    />
+                                                </FormControl>
+                                            </Grid>
                                         </Grid>
-                                    </Grid>
-                                    {loading ?
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            fullWidth
-                                            size="large"
-                                            sx={{ marginTop: '20px' }}
-                                        >
-                                            <div className='animate-spin'><HourglassTopIcon></HourglassTopIcon></div>
-                                        </Button> :
-                                        <Button
-                                            type="submit"
-                                            variant="contained"
-                                            color="primary"
-                                            fullWidth
-                                            size="large"
-                                            sx={{ marginTop: '20px' }}
-                                        >
-                                            Create Task
-                                        </Button>
-                                    }
-                                </form>
-                            </div>
-                        </Container>
-                    </Box>
+                                        {loading ?
+                                            <Button
+                                                variant="contained"
+                                                color="primary"
+                                                fullWidth
+                                                size="large"
+                                                sx={{ marginTop: '20px' }}
+                                            >
+                                                <div className='animate-spin'><HourglassTopIcon></HourglassTopIcon></div>
+                                            </Button> :
+                                            <Button
+                                                type="submit"
+                                                variant="contained"
+                                                color="primary"
+                                                fullWidth
+                                                size="large"
+                                                sx={{ marginTop: '20px' }}
+                                            >
+                                                Create Task
+                                            </Button>
+                                        }
+                                    </form>
+                                </div>
+                            </Container>
+                        </Box>
+                    </div>
                 </Fade>
             </Modal>
         </div>

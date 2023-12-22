@@ -1,5 +1,14 @@
+import { IconButton } from "@mui/material";
 import { Draggable } from "react-beautiful-dnd";
 import styled from "styled-components";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import useAxiosPublic from "../hooks/useAxiosPublic";
+import { useContext, useState } from "react";
+import { ContextProvider } from "../auth/AuthProvider";
+import useGetAllTodo from "../hooks/useGetAllTodo";
+import EditTask from "./EditTask";
+import toast from 'react-hot-toast';
 
 
 const Container = styled.div`
@@ -18,23 +27,53 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
-const TextContent = styled.div``;
 
 function bgcolorChange(props) {
   return props.isDragging
     ? "lightgreen"
     : props.isDraggable
-    ? props.isBacklog
-      ? "#F2D7D5"
-      : "#DCDCDC"
-    : props.isBacklog
-    ? "#F2D7D5"
-    : "#EAF4FC";
+      ? props.isBacklog
+        ? "#F2D7D5"
+        : "#DCDCDC"
+      : props.isBacklog
+        ? "#F2D7D5"
+        : "#EAF4FC";
 }
 
 export default function Task({ task, index }) {
+  const axiosPublic = useAxiosPublic();
+  const { user } = useContext(ContextProvider)
+  const [, refetch] = useGetAllTodo()
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  const [updateData, setUpdateData] = useState({});
+
+  const handleDelete = id => {
+    axiosPublic.delete(`/delete-task?id=${id}&email=${user.email}`)
+      .then(res => {
+        if (res.data.acknowledged) {
+          refetch()
+          toast.success('delete successfully')
+        }
+        if (res.data.message == false) {
+          toast.error("You did't create it")
+        }
+      })
+  }
+
+  const handleLoadTask = id => {
+         setUpdateData({});
+        axiosPublic.get(`/todo-data/${id}`)
+        .then(res=> {
+           setUpdateData(res.data);
+        })
+  }
+
+
+
   return (
-    <Draggable draggableId={`${task.id}`} key={task.id} index={index}>
+    <Draggable draggableId={`${task._id}`} key={task._id} index={index}>
       {(provided, snapshot) => (
         <Container
           {...provided.draggableProps}
@@ -42,19 +81,31 @@ export default function Task({ task, index }) {
           ref={provided.innerRef}
           isDragging={snapshot.isDragging}
         >
-          <div style={{ display: "flex", justifyContent: "start", padding: 2 }}>
-            <span>
-              <small>
-                #{task.id}
-                {"  "}
-              </small>
-            </span>
-          </div>
-          <div
-            style={{ display: "flex", justifyContent: "center", padding: 2 }}
-          >
-            <TextContent>{task.title}</TextContent>
-            <button>BUTTON</button>
+          <div>
+            <div className="flex justify-between items-center">
+              <h1 className="text-center flex-1 text-xl uppercase font-semibold text-gray-700">{task.title}</h1>
+              <div className="flex items-center gap-3">
+                <div onClick={() => handleDelete(task._id)}>
+                  <IconButton >
+                    <DeleteIcon></DeleteIcon>
+                  </IconButton>
+                </div>
+                <div>
+                  <div onClick={()=>handleLoadTask(task._id)}>
+                    <IconButton variant="contained" onClick={handleOpen}>
+                      <EditIcon></EditIcon>
+                    </IconButton>
+                  </div>
+
+                  <EditTask open={open} updateData={updateData} handleClose={handleClose}></EditTask>
+                </div>
+              </div>
+            </div>
+            <p className="text-gray-600 my-3">{task.description}</p>
+            <div className="flex justify-between items-center">
+              <p>Deadline: {task.deadline}</p>
+              <p className="font-semibold text-gray-600 uppercase">{task.priority}</p>
+            </div>
           </div>
           {provided.placeholder}
         </Container>

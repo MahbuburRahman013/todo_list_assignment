@@ -12,6 +12,9 @@ import { useContext } from 'react';
 import { ContextProvider } from '../auth/AuthProvider';
 import { updateProfile } from 'firebase/auth';
 import { auth } from '../../firebase.config';
+import toast from 'react-hot-toast';
+import {useNavigate} from 'react-router-dom'
+
 
 
 
@@ -19,6 +22,7 @@ const Registration = () => {
 
     const { handleSubmit, control } = useForm();
     const {createUser} = useContext(ContextProvider);
+    const navigate = useNavigate()
    
 
     const onSubmit =(data) => {
@@ -29,16 +33,21 @@ const Registration = () => {
                     displayName: data.Name,
                     photoURL: data.photo,
                 }).then(()=> {
-                    console.log(result.user)
+                    toast.success('Sign Up Successfully')
+                    navigate('/')
                 })
                 .catch(error=> {
-                    console.log(error.message)
+                    if(error.message){
+                        toast.error(error.message)
+                    }
                 })
                 
             }
         })
         .catch(error=> {
-            console.log(error.message)
+            if(error.message){
+                toast.error(error.message)
+            }
         })
         
     }
